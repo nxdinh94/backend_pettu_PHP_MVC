@@ -1,0 +1,37 @@
+Danh sách API2
+
+1. API login: http://localhost:80/backend_pettu/api/login
+1. API dang ki: http://localhost:80/backend_pettu/api/register
+1. API dang xuat: http://localhost:80/backend_pettu/api/logout
+2. API thông tin chi tiết của Pets: http://localhost:80/backend_pettu/api/pets/petsInfo
+3. API thông tin chi tiết của Services: http://localhost:80/backend_pettu/api/services/servicesInfo
+4. API thông tin chi tiết của Expert Team: http://localhost:80/backend_pettu/api/expert_team/teamInfo
+5. API danh sách News theo danh mục: http://localhost:80/backend_pettu/api/blogs/listBlog
+1. API thay đổi thông tin người dùng: http://localhost:80/backend_pettu/api/users/update
+5. API thêm sản phẩm vào giỏ hàng: http://localhost:80/backend_pettu/api/users/addProductToCart
+6. API thay đổi số lượng sản phẩm trong giỏ hàng: http://localhost:80/backend_pettu/api/users/updateQuantityInCart
+7. API xoá sản phẩm trong giỏ hàng: http://localhost:80/backend_pettu/api/users/deleteProductInCart
+8. API lấy danh sách sản phẩm trong giỏ hàng: http://localhost:80/backend_pettu/api/users/getListProductCart
+
+9. API lấy số lượng sản phẩm trong giỏ hàng: http://localhost:80/backend_pettu/api/users/countListProductCart
+10. API tiến hành mua hàng giỏ hàng: http://localhost:80/backend_pettu/api/users/checkOutCart
+11. API thanh toán giỏ hàng: http://localhost:80/backend_pettu/api/users/paymentCart
+12. API lấy thông tin bill_detail: http://localhost:80/backend_pettu/api/users/billDetail
+13. API xoá bill - bill_detail khi unpayment: http://localhost:80/backend_pettu/api/users/deleteBillDetail
+14. API lấy danh sách hoá đơn đã được duyệt: http://localhost:80/backend_pettu/api/users/getApprovedBill
+
+1. API người dùng đăng ký dịch vụ: http://localhost:80/backend_pettu/api/users/registerService
+4. API huỷ dịch vụ đã đăng ký: http://localhost:80/backend_pettu/api/users/deleteService
+6.  API cập nhật dịch vụ đã đăng kí: http://localhost:80/backend_pettu/api/users/updatePeriodTime
+
+6. API danh sách các sản phẩm: http://localhost:80/backend_pettu/api/products/listProduct
+Admin Page
+1. API lấy danh sách người dùng: http://localhost:80/backend_pettu/api/dashboard/listUser
+2. API lấy danh sách nhân sự: http://localhost:80/backend_pettu/api/dashboard/listCompetentPersonnel
+3. API thay đổi trạng thái tài khoản của user: http://localhost:80/backend_pettu/api/dashboard/updateStatusAccount
+4. API lấy danh sách dịch vụ đã đăng ký: http://localhost:80/backend_pettu/api/users/getService
+5. API thông tin thời gian làm việc: http://localhost:80/backend_pettu/api/services/getTimeWorking
+5. API lấy danh sách dịch vụ đăng cần chờ duyệt: http://localhost:80/backend_pettu/api/dashboard/getPendingService
+5. API  duyệt dịch vụ: http://localhost:80/backend_pettu/api/dashboard/confirmRegisterService
+6.  API lấy trạng thái dịch vụ người dùng đã đăng ký: http://localhost:80/backend_pettu/api/dashboard/isRegistered
+7. API lấy danh sách hoá đơn đang chờ duyệt: http://localhost:80/backend_pettu/api/dashboard/getPendingBill
