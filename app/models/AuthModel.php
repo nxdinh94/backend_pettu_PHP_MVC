@@ -31,7 +31,7 @@ class AuthModel extends Model {
                 $dataToken = [
                     'user_id' => $userId,
                     'token' => $loginToken,
-                    'create_at' => date('Y-m-d H:i:s')
+                    'created_at' => date('Y-m-d H:i:s')
                 ];
 
                 $insertTokenStatus = $this->db->table('login_token')->insert($dataToken);
@@ -81,7 +81,7 @@ class AuthModel extends Model {
             'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
             'active_token' => $activeToken,
             'decentralization_id' => 2,
-            'create_at' => date('Y-m-d H:i:s')
+            'created_at' => date('Y-m-d H:i:s')
         ];
 
         $insertStatus = $this->db->table('users')->insert($dataInsert);

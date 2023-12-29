@@ -180,6 +180,7 @@ class Cart extends Controller {
 
                 echo json_encode($response);
             endif;
+            
         endif;
     }
 

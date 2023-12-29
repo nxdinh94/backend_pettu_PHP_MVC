@@ -170,4 +170,37 @@ class User extends Controller {
             echo json_encode($response);
         endif;
     }
+     // Thay đổi trạng thái thanh toán dịch vụ
+    public function changeServicePaymentStatus() {
+        $request = new Request();
+
+        if ($request->isPost()): // Kiểm tra post
+            $data = $request->getFields();
+
+            if (!empty($data['userId']) && !empty($data['serviceId'])):
+                $userId = $data['userId'];
+                $serviceId = $data['serviceId'];
+
+                $result = $this->userModel->handleChangeServicePaymentStatus($userId, $serviceId); // Gọi xử lý ở Model
+
+                if ($result):
+                    $response = [
+                        'status' => true,
+                        'message' => 'Thay đổi thành công'
+                    ];
+                else:
+                    $response = [
+                        'status' => false,
+                        'message' => 'Đã có lỗi xảy ra'
+                    ];
+                endif;
+            else:
+                $response = [
+                    'message' => 'Đã có lỗi xảy ra'
+                ];
+            endif;
+
+            echo json_encode($response);
+        endif;
+    }
 }

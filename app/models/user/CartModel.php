@@ -155,13 +155,14 @@ class CartModel extends Model {
         return count($this->handleGetListProductInCart($userId));
     }
     // Xử lý tiến hành mua hàng
-    public function handleCheckOut($userId, $data) {
+    public function handleCheckOut($userId, $data)
+    {
         $queryCheck = $this->db->table('cart')
-            ->select('id')
+        ->select('id')
             ->where('userid', '=', $userId)
             ->first();
 
-        if (!empty($queryCheck)):
+        if (!empty($queryCheck)) :
             $dataInsert = [
                 'userid' => $userId,
                 'total_price' => 0,
@@ -169,15 +170,16 @@ class CartModel extends Model {
             ];
 
             $insertBillData = $this->db->table('bill')
-                ->insert($dataInsert);
+            ->insert($dataInsert);
 
-            if ($insertBillData):
+            if ($insertBillData) :
                 $billId = $this->db->lastId();
 
-                if (!empty($data)):
+                if (!empty($data)) :
                     unset($data[0]);
                     $data = array_values($data);
-                    foreach ($data as $item):
+
+                    foreach ($data as $item) :
                         $dataInsertBillDetail = [
                             'productid' => $item['id'],
                             'price' => $item['intoMoney'],
@@ -189,11 +191,10 @@ class CartModel extends Model {
                         $insertStatus = $this->db->table('billdetail')->insert($dataInsertBillDetail);
                     endforeach;
 
-                    if ($insertStatus):
+                    if ($insertStatus) :
                         return $billId;
                     endif;
                 endif;
-                // return var_dump($data);
             endif;
         endif;
 
@@ -204,37 +205,36 @@ class CartModel extends Model {
     public function handlePayment($userId, $data, $paymentMethod, $billId)
     {
         $queryGetBillDetail = $this->db->table('billdetail')
-            ->select('billdetail.billid, billdetail.quantity, billdetail.price')
-            ->join('bill', 'billdetail.billid = bill.billid')
-            ->where('bill.userid', '=', $userId)
+        ->select('billdetail.billid, billdetail.quantity, billdetail.price')
+        ->join('bill', 'billdetail.billid = bill.billid')
+        ->where('bill.userid', '=', $userId)
+            ->where('billdetail.billid', '=', $billId)
             ->get();
 
-        if (!empty($queryGetBillDetail)):
-            $billId = $queryGetBillDetail[0]['billid'];
-
-            foreach ($queryGetBillDetail as $item):
+        if (!empty($queryGetBillDetail)) :
+            foreach ($queryGetBillDetail as $item) :
                 $queryGetBill = $this->db->table('bill')
-                    ->select('total_price')
-                    ->where('billid', '=', $billId)
+                ->select('total_price')
+                ->where('billid', '=', $billId)
                     ->first();
 
-                if (!empty($queryGetBill)):
+                if (!empty($queryGetBill)) :
                     $dataUpdateBill = [
-                        'total_price' => $queryGetBill['total_price'] + $item['quantity'] * $item['price'],
+                        'total_price' => $queryGetBill['total_price'] + $item['price'],
                         'payment_method' => $paymentMethod,
                     ];
 
                     $updateStatus = $this->db->table('bill')
-                        ->where('billid', '=', $billId)
+                    ->where('billid', '=', $billId)
                         ->update($dataUpdateBill);
+
+                    $this->db->resetQuery();
                 endif;
             endforeach;
 
-            $this->db->resetQuery();
-
-            if ($updateStatus):
+            if ($updateStatus) :
                 $deleteAfterPayment = $this->handleDeleteAfterPayment($userId, $data);
-                if ($deleteAfterPayment):
+                if ($deleteAfterPayment) :
                     return true;
                 endif;
             endif;
@@ -243,7 +243,8 @@ class CartModel extends Model {
         return false;
     }
 
-    // Xoá sau khi thanh toán billdetail - cart
+   
+    // Xoá sản phẩm trong giỏ hàng sau khi thanh toán billdetail - cart
       public function handleDeleteAfterPayment($userId, $data) {
         foreach ($data as $item):
             $deleteCart = $this->db->table('cart')
@@ -318,21 +319,19 @@ class CartModel extends Model {
     public function handleGetListBillApproved($userId)
     {
         $queryGet = $this->db->table('bill')
-        ->select('bill.billid, bill.payment_method, bill.total_price, bill.created_at,
-                billdetail.productid, billdetail.quantity, billdetail.price, product.product_name')
+            ->select('bill.billid, bill.payment_method, bill.total_price, bill.created_at,
+                billdetail.productid, billdetail.quantity, billdetail.price, product.product_name,
+                product.color, product.dimensions, product.thumpnail2')
         ->join('billdetail', 'billdetail.billid = bill.billid')
         ->join('product', 'billdetail.productid = product.productid')
         ->where('bill.userid', '=', $userId)
             ->where('bill.status', '=', 1)
             ->get();
-
         $response = [];
         $resultArray = [];
-
         if (!empty($queryGet)) :
             foreach ($queryGet as $item) {
                 $billId = $item["billid"];
-
                 if (!isset($resultArray[$billId])) {
                     // Nếu billid chưa có trong mảng kết quả, tạo một mục mới
                     $resultArray[$billId] = [
@@ -342,16 +341,17 @@ class CartModel extends Model {
                         "products" => []
                     ];
                 }
-
                 // Thêm thông tin sản phẩm vào danh sách sản phẩm của billid
                 $resultArray[$billId]["products"][] = [
                     "productid" => $item["productid"],
                     "quantity" => $item["quantity"],
+                    "thumpnail2" => $item["thumpnail2"],
+                    "color" => $item["color"],
+                    "dimensions" => $item["dimensions"],
                     "price" => $item["price"],
                     "product_name" => $item["product_name"]
                 ];
             }
-
             $response = $resultArray;
         endif;
 

@@ -50,7 +50,7 @@ class ProfileModel extends Model
                             dob, address, phone, password, about_content, 
                             contact_facebook, contact_twitter, contact_linkedin,
                             contact_pinterest, status, decentralization_id, 
-                            last_activity, create_at')
+                            last_activity, created_at')
                     ->where('id', '=', $userId)
                     ->first();
                 // Update lại session

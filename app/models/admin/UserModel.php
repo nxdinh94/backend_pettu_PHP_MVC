@@ -20,7 +20,7 @@ class UserModel extends Model {
         $queryGet = $this->db->table('users')
             ->select('id, fullname, thumbnail, email, dob, address, phone, 
                 about_content, contact_facebook, contact_twitter, contact_linkedin,
-                contact_pinterest, status, create_at')
+                contact_pinterest, status, created_at')
             ->where('decentralization_id', '=', '2')
             ->get();
 
@@ -50,7 +50,7 @@ class UserModel extends Model {
         $queryGet = $this->db->table('users')
             ->select('id, fullname, thumbnail, email, dob, address, phone, 
                 about_content, contact_facebook, contact_twitter, contact_linkedin,
-                contact_pinterest, status, create_at')
+                contact_pinterest, status, created_at')
             ->where('decentralization_id', '=', '3')
             ->get();
 
@@ -136,7 +136,7 @@ class UserModel extends Model {
         ->join('services', 'services.id = user_service.serviceid')
         ->join('users', 'users.id = user_service.userid')
         ->where('user_service.status', '=', '0')
-            ->get();
+        ->get();
 
         $response = [];
         $checkNull = false;
@@ -189,5 +189,31 @@ class UserModel extends Model {
         endif;
 
         return $response;
+    }
+    // Xử lý thay đổi trạng thái thanh toán dịch vụ
+    public function handleChangeServicePaymentStatus($userId, $serviceId) {
+        $checkEmpty = $this->db->table('user_service')
+            ->select('payment_status')
+            ->where('userid', '=', $userId)
+            ->where('serviceid', '=', $serviceId)
+            ->first();
+
+        if (!empty($checkEmpty)):
+            $dataUpdate = [
+                'payment_status' => 1,
+                'updated_at' => date('Y-m-d H:i:s')
+            ];
+
+            $updateStatus = $this->db->table('user_service')
+                ->where('userid', '=', $userId)
+                ->where('serviceid', '=', $serviceId)
+                ->update($dataUpdate);
+
+            if ($updateStatus):
+                return true;
+            endif;
+        endif;
+
+        return false;
     }
 }
