@@ -63,11 +63,15 @@ class Profile extends Controller
 
                     if ($result) :
                         $response = [
+                            'status' => true,
                             'message' => 'Thay đổi thành công',
                             'user_data' => Session::data('user_data')
                         ];
                     else :
-                        $response = $request->errors();
+                        $response = [
+                            'status' => false, 
+                            'message' =>'Thay đổi không thành công'
+                        ];
                     endif;
                 else :
                     $response = $request->errors();

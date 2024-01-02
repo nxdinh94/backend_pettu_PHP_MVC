@@ -34,7 +34,8 @@ class ProfileModel extends Model
                 'contact_twitter' => $_POST['contact_twitter'],
                 'contact_linkedin' => $_POST['contact_linkedin'],
                 'contact_pinterest' => $_POST['contact_pinterest'],
-                'update_at' => date('Y-m-d H:i:s')
+                'delivery_address' => $_POST['delivery_address'],
+                'updated_at' => date('Y-m-d H:i:s')
             ];
 
             $updateStatus = $this->db->table('users')
@@ -47,9 +48,9 @@ class ProfileModel extends Model
 
                 $userData = $this->db->table('users')
                     ->select('id, fullname, thumbnail, email, 
-                            dob, address, phone, password, about_content, 
+                            dob, address, phone, about_content, 
                             contact_facebook, contact_twitter, contact_linkedin,
-                            contact_pinterest, status, decentralization_id, 
+                            contact_pinterest, status, decentralization_id, delivery_address,
                             last_activity, created_at')
                     ->where('id', '=', $userId)
                     ->first();
