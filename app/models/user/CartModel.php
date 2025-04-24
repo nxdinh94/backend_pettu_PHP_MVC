@@ -381,7 +381,7 @@ class CartModel extends Model {
         ->join('billdetail', 'billdetail.billid = bill.billid')
         ->join('product', 'billdetail.productid = product.productid')
         ->where('bill.userid', '=', $userId)
-            ->where('bill.status', '=', 1)
+            ->where('bill.status', '=', 'confirmed')
             ->get();
         $response = [];
         $resultArray = [];

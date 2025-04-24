@@ -25,22 +25,22 @@ class UserModel extends Model {
             ->get();
 
         $response = [];
-        $checkNull = false;
+        // $checkNull = false;
 
-        if (!empty($queryGet)):
-            foreach ($queryGet as $key => $item):
-                foreach ($item as $subKey => $subItem):
-                    if ($subItem === NULL || $subItem === ''):
-                        $checkNull = true;
-                    endif;
-                endforeach;
-            endforeach;
-        endif;
+        // if (!empty($queryGet)):
+        //     foreach ($queryGet as $key => $item):
+        //         foreach ($item as $subKey => $subItem):
+        //             if ($subItem === NULL || $subItem === ''):
+        //                 $checkNull = true;
+        //             endif;
+        //         endforeach;
+        //     endforeach;
+        // endif;
 
-        if (!$checkNull):
-            $response = $queryGet;
-        endif;
-
+        // if (!$checkNull):
+        //     $response = $queryGet;
+        // endif;
+        $response = $queryGet;
         return $response;
 
     }
