@@ -204,7 +204,8 @@ class Cart extends Controller {
                     $response = [
                         'status' => true,
                         'message' => 'Thanh toán thành công',
-                        'data' => $result
+                        'data' => $result,
+                        'payment_method' => $paymentMethod,
                     ];
                 else:
                     $response = [
@@ -292,6 +293,71 @@ class Cart extends Controller {
 
                 if (!empty($userId)) :
                     $result = $this->cartModel->handleGetListBillApproved($userId);
+
+                    if (!empty($result)) :
+                        $response = [
+                            'status' => true,
+                            'data' => $result
+                        ];
+                    else :
+                        $response = [
+                            'status' => false,
+                            'message' => 'Đã có lỗi xảy ra'
+                        ];
+                    endif;
+
+                    echo json_encode($response);
+                endif;
+            endif;
+        endif;
+    }
+    // Lấy danh sách hoá đơn đang vận chuyển
+    public function getListBillDelivery()
+    {
+        $request = new Request();
+
+        if ($request->isPost()) :
+            $data = $request->getFields();
+            $response = [];
+
+            if (!empty($data['userId'])) :
+                $userId = $data['userId'];
+
+                if (!empty($userId)) :
+                    $result = $this->cartModel->handleGetListBillDelivery($userId);
+
+                    if (!empty($result)) :
+                        $response = [
+                            'status' => true,
+                            'data' => $result
+                        ];
+                    else :
+                        $response = [
+                            'status' => false,
+                            'message' => 'Đã có lỗi xảy ra'
+                        ];
+                    endif;
+
+                    echo json_encode($response);
+                endif;
+            endif;
+        endif;
+    }
+
+    // Lấy danh sách hoá đơn đã vận chuyển
+    public function getListBillShipped()
+    {
+        $request = new Request();
+
+        if ($request->isPost()) :
+            $data = $request->getFields();
+            $response = [];
+
+            if (!empty($data['userId'])) :
+                $userId = $data['userId'];
+
+                if (!empty($userId)) :
+                    $result = $this->cartModel->handleGetListBillShipped($userId);
 
                     if (!empty($result)) :
                         $response = [

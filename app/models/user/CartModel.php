@@ -231,10 +231,48 @@ class CartModel extends Model {
                 endif;
             endforeach;
 
+            $paymentMethod = strtolower($paymentMethod);
+
             if ($updateStatus) {
-                $vpnUrl = $this->handleCreatePaymentUrl($billId);
-                return $vpnUrl;
-            }
+                if ($paymentMethod == 'vnpay') {
+                    $vpnUrl = $this->handleCreatePaymentUrl($billId);
+                    return $vpnUrl;
+                } elseif ($paymentMethod == 'cod') {
+                    $logPath = 'payment_cod.log'; // đường dẫn tới thư mục log
+
+                    $bill = $this->db->table('bill')->where('billid', '=', $billId)->first();
+
+                    if (!$bill) {
+                        file_put_contents($logPath, "[" . date('Y-m-d H:i:s') . "] Không tìm thấy đơn hàng với billId: $billId\n", FILE_APPEND);
+                        return;
+                    }
+
+                    $user = $this->db->table('users')
+                        ->where('id', '=', $bill['userid'])
+                        ->first();
+
+                    if (!$user) {
+                        file_put_contents($logPath, "[" . date('Y-m-d H:i:s') . "] Không tìm thấy người dùng với userId: {$bill['userid']}\n", FILE_APPEND);
+                        return;
+                    }
+
+                    $billDetails = $this->db->table('billdetail')
+                        ->select('billdetail.quantity, billdetail.price, billdetail.productid, product.product_name')
+                        ->join('product', 'product.productid = billdetail.productid')
+                        ->where('billid', '=', $billId)
+                        ->get();
+    
+                    $postData = [
+                        'userId' => $user['id'],
+                        'paymentMethod' => $bill['payment_method'],
+                        'products' => $billDetails,
+                    ];
+
+                    $n8nUrl = 'http://localhost:5678/webhook-test/payment';
+                    $this->handleSendPostRequestToN8n($n8nUrl, $postData);
+                    return true;
+                }
+            } 
             // if ($updateStatus):
             //     $deleteAfterPayment = $this->handleDeleteAfterPayment($userId, $data);
             //     if ($deleteAfterPayment):
@@ -244,6 +282,30 @@ class CartModel extends Model {
         endif;
 
         return null;
+    }
+
+    private function handleSendPostRequestToN8n($url, $data)
+    {
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+        // Set headers nếu cần (nếu n8n yêu cầu)
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+        ]);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        // Kiểm tra phản hồi từ n8n nếu cần
+        if ($response === false) {
+            // Log lỗi nếu cần thiết
+            file_put_contents('n8n_error.log', "Error sending data to n8n: " . curl_error($ch) . "\n", FILE_APPEND);
+        }
     }
 
     public function handleCreatePaymentUrl($billId) {
@@ -382,6 +444,92 @@ class CartModel extends Model {
         ->join('product', 'billdetail.productid = product.productid')
         ->where('bill.userid', '=', $userId)
             ->where('bill.status', '=', 'confirmed')
+            ->get();
+        $response = [];
+        $resultArray = [];
+        if (!empty($queryGet)) :
+            foreach ($queryGet as $item) {
+                $billId = $item["billid"];
+                if (!isset($resultArray[$billId])) {
+                    // Nếu billid chưa có trong mảng kết quả, tạo một mục mới
+                    $resultArray[$billId] = [
+                        "payment_method" => $item["payment_method"],
+                        "total_price" => $item["total_price"],
+                        "created_at" => $item["created_at"],
+                        "products" => []
+                    ];
+                }
+                // Thêm thông tin sản phẩm vào danh sách sản phẩm của billid
+                $resultArray[$billId]["products"][] = [
+                    "productid" => $item["productid"],
+                    "quantity" => $item["quantity"],
+                    "thumpnail2" => $item["thumpnail2"],
+                    "color" => $item["color"],
+                    "dimensions" => $item["dimensions"],
+                    "price" => $item["price"],
+                    "product_name" => $item["product_name"]
+                ];
+            }
+            $response = $resultArray;
+        endif;
+
+        return $response;
+    }
+
+    // Xử lý lấy danh sách hoá đơn đang vận chuyển
+    public function handleGetListBillDelivery($userId)
+    {
+        $queryGet = $this->db->table('bill')
+            ->select('bill.billid, bill.payment_method, bill.total_price, bill.created_at,
+                billdetail.productid, billdetail.quantity, billdetail.price, product.product_name,
+                product.color, product.dimensions, product.thumpnail2')
+        ->join('billdetail', 'billdetail.billid = bill.billid')
+        ->join('product', 'billdetail.productid = product.productid')
+        ->where('bill.userid', '=', $userId)
+            ->where('bill.status', '=', 'delivery')
+            ->get();
+        $response = [];
+        $resultArray = [];
+        if (!empty($queryGet)) :
+            foreach ($queryGet as $item) {
+                $billId = $item["billid"];
+                if (!isset($resultArray[$billId])) {
+                    // Nếu billid chưa có trong mảng kết quả, tạo một mục mới
+                    $resultArray[$billId] = [
+                        "payment_method" => $item["payment_method"],
+                        "total_price" => $item["total_price"],
+                        "created_at" => $item["created_at"],
+                        "products" => []
+                    ];
+                }
+                // Thêm thông tin sản phẩm vào danh sách sản phẩm của billid
+                $resultArray[$billId]["products"][] = [
+                    "productid" => $item["productid"],
+                    "quantity" => $item["quantity"],
+                    "thumpnail2" => $item["thumpnail2"],
+                    "color" => $item["color"],
+                    "dimensions" => $item["dimensions"],
+                    "price" => $item["price"],
+                    "product_name" => $item["product_name"]
+                ];
+            }
+            $response = $resultArray;
+        endif;
+
+        return $response;
+    }
+
+    // Xử lý lấy danh sách hoá đơn đã vận chuyển
+    public function handleGetListBillShipped($userId)
+    {
+        $queryGet = $this->db->table('bill')
+            ->select('bill.billid, bill.payment_method, bill.total_price, bill.created_at,
+                billdetail.productid, billdetail.quantity, billdetail.price, product.product_name,
+                product.color, product.dimensions, product.thumpnail2')
+        ->join('billdetail', 'billdetail.billid = bill.billid')
+        ->join('product', 'billdetail.productid = product.productid')
+        ->where('bill.userid', '=', $userId)
+            ->where('bill.status', '=', 'shipped')
             ->get();
         $response = [];
         $resultArray = [];
