@@ -36,7 +36,7 @@ class AuthModel extends Model {
 
                 $insertTokenStatus = $this->db->table('login_token')->insert($dataToken);
                 if ($insertTokenStatus) :
-                    if ($statusAccount === 1) :
+                    if ($statusAccount == 1) :
                         $insertTokenStatus = $this->db->table('login_token')->insert($dataToken);
                         if ($insertTokenStatus) :
                             $userData = $this->db->table('users')
@@ -53,13 +53,13 @@ class AuthModel extends Model {
                         endif;
                     endif;
 
-                    if ($statusAccount === 0) :
+                    if ($statusAccount == 0) :
                         $response = [
                             'message' => 'Vui lòng kích hoạt tài khoản tại Gmail bạn dùng để đăng ký tài khoản'
                         ];
                     endif;
 
-                    if ($statusAccount === 2) :
+                    if ($statusAccount == 2) :
                         $response = [
                             'message' => 'Tài khoản của bạn đã tạm thời bị khoá. Vui lòng liên hệ quản trị viên để xử lý'
                         ];
@@ -85,22 +85,25 @@ class AuthModel extends Model {
         ];
 
         $insertStatus = $this->db->table('users')->insert($dataInsert);
-        if ($insertStatus) :
-            // Tạo link active
-            $linkActive = _WEB_ROOT . '/auth/active?token=' . $activeToken;
-            // Thiết lập mail
-            $subject = ucwords($_POST['fullname']) . ' ơi. Bạn vui lòng kích hoạt tài khoản';
-            $content = 'Chào bạn: ' . ucwords($_POST['fullname']) . '<br>';
-            $content .= 'Vui lòng click vào link dưới đây để kích hoạt tài khoản của bạn: <br>';
-            $content .= $linkActive . '<br>';
-            $content .= 'Trân trọng!';
+        if ($insertStatus) {
+            return true;
+        }
+        // if ($insertStatus) :
+        //     // Tạo link active
+        //     $linkActive = _WEB_ROOT . '/auth/active?token=' . $activeToken;
+        //     // Thiết lập mail
+        //     $subject = ucwords($_POST['fullname']) . ' ơi. Bạn vui lòng kích hoạt tài khoản';
+        //     $content = 'Chào bạn: ' . ucwords($_POST['fullname']) . '<br>';
+        //     $content .= 'Vui lòng click vào link dưới đây để kích hoạt tài khoản của bạn: <br>';
+        //     $content .= $linkActive . '<br>';
+        //     $content .= 'Trân trọng!';
 
-            $sendStatus = Mailer::sendMail($_POST['email'], $subject, $content);
+        //     $sendStatus = Mailer::sendMail($_POST['email'], $subject, $content);
 
-            if ($sendStatus) :
-                return true;
-            endif;
-        endif;
+        //     if ($sendStatus) :
+        //         return true;
+        //     endif;
+        // endif;
 
         return false;
     }

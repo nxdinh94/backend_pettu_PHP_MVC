@@ -198,11 +198,13 @@ class Cart extends Controller {
                 $billId = $data['billId'];
                 $paymentMethod = $data['payment_method'];
 
-                $result = $this->cartModel->handlePayment($userId, $data['paymentProduct'], $paymentMethod, $billId);
+                // $result = $this->cartModel->handlePayment($userId, $data['paymentProduct'], $paymentMethod, $billId);
+                $result = $this->cartModel->handlePayment($userId, $paymentMethod, $billId);
                 if ($result):
                     $response = [
                         'status' => true,
-                        'message' => 'Thanh toán thành công'
+                        'message' => 'Thanh toán thành công',
+                        'data' => $result
                     ];
                 else:
                     $response = [

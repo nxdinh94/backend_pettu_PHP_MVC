@@ -68,4 +68,7 @@ $routes['api/dashboard/countListStatusBill'] = 'admin/dashboard/count/countListS
 $routes['api/dashboard/countListStatusPayment'] = 'admin/dashboard/count/countListStatusPayment';//API Số dịch vụ thanh toán chờ duyệt
 $routes['api/dashboard/countListStatusUser_Service'] = 'admin/dashboard/count/countListStatusUser_Service';// API số dịch vụ chờ duyệt
 
+# Payment
+$routes['api/payment/callback'] = 'user/payment/receiveVNPayCallback'; // API tạo đường dẫn thanh toán - User
+
 ?>
