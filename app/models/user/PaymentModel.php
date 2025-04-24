@@ -81,13 +81,14 @@ class PaymentModel extends Model {
     
     
                 $billDetails = $this->db->table('billdetail')
-                    ->select('billdetail.quantity, billdetail.price, product.product_name')
+                    ->select('billdetail.quantity, billdetail.price, billdetail.productid, product.product_name')
                     ->join('product', 'product.productid = billdetail.productid')
                     ->where('billid', '=', $billId)
                     ->get();
     
                 $postData = [
                     'email' => $user['email'],
+                    'userId' => $user['id'],
                     'billId' => $billId,
                     'totalPrice' => $bill['total_price'],
                     'paymentMethod' => $bill['payment_method'],
@@ -131,5 +132,23 @@ class PaymentModel extends Model {
             // Log lỗi nếu cần thiết
             file_put_contents('n8n_error.log', "Error sending data to n8n: " . curl_error($ch) . "\n", FILE_APPEND);
         }
+    }
+
+    // Xoá sản phẩm trong giỏ hàng sau khi thanh toán billdetail - cart
+    public function handleDeleteCartAfterPayment($userId, $data) {
+        foreach ($data as $item):
+            $deleteCart = $this->db->table('cart')
+                ->where('productid', '=', $item['id'])
+                ->where('userid', '=', $userId)
+                ->delete();
+            $this->db->resetQuery();
+        endforeach;
+
+        if ($deleteCart):
+            return true;
+           
+        endif;
+
+        return false;
     }
 }

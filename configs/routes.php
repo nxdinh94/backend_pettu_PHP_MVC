@@ -70,5 +70,6 @@ $routes['api/dashboard/countListStatusUser_Service'] = 'admin/dashboard/count/co
 
 # Payment
 $routes['api/payment/callback'] = 'user/payment/receiveVNPayCallback'; // API tạo đường dẫn thanh toán - User
+$routes['api/payment/deleteCartAfterPayment'] = 'user/payment/deleteCartAfterPayment'; // API xoá sản phẩm trong giỏ hàng sau khi thanh toán - User
 
 ?>

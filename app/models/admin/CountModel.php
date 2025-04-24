@@ -95,7 +95,7 @@ class CountModel extends Model {
     public function handleGetListStatusBill() {
         $queryGet = $this->db->table('bill')
             ->select('billid')
-            ->where('status','=',0)
+            ->where('status','=', 'pending')
             ->get();
 
         $response = [];

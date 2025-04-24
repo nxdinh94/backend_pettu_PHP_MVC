@@ -300,23 +300,23 @@ class CartModel extends Model {
         return $vnpUrl;
     }
    
-    // Xoá sản phẩm trong giỏ hàng sau khi thanh toán billdetail - cart
-      public function handleDeleteAfterPayment($userId, $data) {
-        foreach ($data as $item):
-            $deleteCart = $this->db->table('cart')
-                ->where('productid', '=', $item['id'])
-                ->where('userid', '=', $userId)
-                ->delete();
-            $this->db->resetQuery();
-        endforeach;
+    // // Xoá sản phẩm trong giỏ hàng sau khi thanh toán billdetail - cart
+    // public function handleDeleteAfterPayment($userId, $data) {
+    //     foreach ($data as $item):
+    //         $deleteCart = $this->db->table('cart')
+    //             ->where('productid', '=', $item['id'])
+    //             ->where('userid', '=', $userId)
+    //             ->delete();
+    //         $this->db->resetQuery();
+    //     endforeach;
 
-        if ($deleteCart):
-            return true;
+    //     if ($deleteCart):
+    //         return true;
            
-        endif;
+    //     endif;
 
-        return false;
-    }
+    //     return false;
+    // }
 
     public function handleGetBillDetail($userId, $billId)
     {
