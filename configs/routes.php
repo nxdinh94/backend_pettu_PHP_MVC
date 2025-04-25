@@ -16,6 +16,7 @@ $routes['api/dashboard/confirmRegisterService'] = 'admin/dashboard/user/confirmR
 
 $routes['api/services/getTimeWorking'] = 'admin/service/getTimeWorking'; // API thời gian dùng dịch vụ
 $routes['api/services/getListUserServiceToday'] = 'admin/service/getListUserServiceToday'; // API lấy danh sách dịch vụ chưa thanh toán - AdminPage
+$routes['api/services/createUserServiceSurvey'] = 'admin/service/createUserServiceSurvey'; // API lấy thông tin chi tiết dịch vụ - AdminPage
 
 $routes['api/pets/petsInfo'] = 'admin/home/getPetDetailInfo'; // API thông tin chi tiết của Pets
 $routes['api/services/servicesInfo'] = 'admin/service/getServiceDetailInfo'; // API thông tin chi tiết của Services
