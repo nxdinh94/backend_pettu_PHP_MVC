@@ -200,4 +200,44 @@ class ServiceModel extends Model {
 
         return false;
     }
+
+    public function handleGetListUserServiceToday() {
+        $today = date('Y-m-d');
+    
+        $queryGet = $this->db->table('user_service')
+            ->select('user_service.serviceid, user_service.userid, 
+            user_service.payment_status, user_service.register_day as date, users.email, services.name as serviceName')
+            ->join('users', 'users.id = user_service.userid')
+            ->join('services', 'services.id = user_service.serviceid')
+            ->where('user_service.register_day', '=', $today)
+            ->get();
+
+        $groupedResponse = [];
+
+        if (!empty($queryGet)) {
+            foreach ($queryGet as $item) {
+                $userId = $item['userid'];
+                $email = $item['email'];
+
+                if (!isset($groupedResponse[$userId])) {
+                    $groupedResponse[$userId] = [
+                        'userid' => $userId,
+                        'email' => $email,
+                        'services' => []
+                    ];
+                }
+    
+                $groupedResponse[$userId]['services'][] = [
+                    'serviceid' => $item['serviceid'],
+                    'serviceName' => $item['serviceName'],
+                    'payment_status' => $item['payment_status'],
+                    'date' => $item['date']
+                ];
+            }
+        }
+    
+        // Trả về dạng mảng giá trị (không có key userid)
+        return array_values($groupedResponse);
+    }
+    
 }
