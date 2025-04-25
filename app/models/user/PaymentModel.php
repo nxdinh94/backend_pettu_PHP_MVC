@@ -88,6 +88,7 @@ class PaymentModel extends Model {
     
                 $postData = [
                     'email' => $user['email'],
+                    'phone' => $user['phone'],
                     'userId' => $user['id'],
                     'billId' => $billId,
                     'totalPrice' => $bill['total_price'],
