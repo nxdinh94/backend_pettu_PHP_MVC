@@ -50,4 +50,25 @@ class Service extends Controller {
         endif;
     }
 
+    public function getListUserServiceToday() {
+        $request = new Request();
+
+        if ($request->isGet()):
+            $result = $this->serviceModel->handleGetListUserServiceToday();
+
+            if (!empty($result)):
+                $response = [
+                    'status' => true,
+                    'data' => $result
+                ];
+            else:
+                $response = [
+                    'status' => false,
+                    'message' => 'Đã có lỗi xảy ra'
+                ];
+            endif;
+            header('Content-Type: application/json');
+            echo json_encode($response);      
+        endif;
+    }
 }
