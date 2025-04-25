@@ -240,4 +240,14 @@ class ServiceModel extends Model {
         return array_values($groupedResponse);
     }
     
+    public function handleCreateUserServiceSurvey($data) {
+        $insertStatus = $this->db->table('survey_service')
+            ->insert($data);
+
+        if ($insertStatus):
+            return true;
+        endif;
+
+        return false;
+    }
 }

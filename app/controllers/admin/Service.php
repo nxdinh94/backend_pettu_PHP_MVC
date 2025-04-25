@@ -71,4 +71,30 @@ class Service extends Controller {
             echo json_encode($response);      
         endif;
     }
+
+    public function createUserServiceSurvey() {
+        $request = new Request();
+
+        if ($request->isPost()):
+            $jsonData = file_get_contents("php://input");
+            $data = json_decode($jsonData, true); // Chuyển đổi JSON thành mảng PHP
+            $response = [];
+
+            $result = $this->serviceModel->handleCreateUserServiceSurvey($data); // Gọi xử lý ở Model
+
+            if ($result):
+                $response = [
+                    'status' => true,
+                    'message' => 'Khảo sát dịch vụ thành công'
+                ];
+            else:
+                $response = [
+                    'status' => false,
+                    'message' => 'Đã có lỗi xảy ra'
+                ];
+            endif;
+            header('Content-Type: application/json');
+            echo json_encode($response);
+        endif;
+    }
 }
