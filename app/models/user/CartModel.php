@@ -264,6 +264,10 @@ class CartModel extends Model {
     
                     $postData = [
                         'userId' => $user['id'],
+                        'email' => $user['email'],
+                        'phone' => $user['phone'],
+                        'totalPrice' => $bill['total_price'],
+                        'billId' => $billId,
                         'paymentMethod' => $bill['payment_method'],
                         'products' => $billDetails,
                     ];
