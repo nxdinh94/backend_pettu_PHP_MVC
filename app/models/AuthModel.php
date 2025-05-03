@@ -81,56 +81,93 @@ class AuthModel extends Model {
             'password' => password_hash($_POST['password'], PASSWORD_DEFAULT),
             'active_token' => $activeToken,
             'decentralization_id' => 2,
+            'status' => 2,
             'created_at' => date('Y-m-d H:i:s')
         ];
 
         $insertStatus = $this->db->table('users')->insert($dataInsert);
-        if ($insertStatus) {
-            return true;
-        }
-        // if ($insertStatus) :
-        //     // Tạo link active
-        //     $linkActive = _WEB_ROOT . '/auth/active?token=' . $activeToken;
-        //     // Thiết lập mail
-        //     $subject = ucwords($_POST['fullname']) . ' ơi. Bạn vui lòng kích hoạt tài khoản';
-        //     $content = 'Chào bạn: ' . ucwords($_POST['fullname']) . '<br>';
-        //     $content .= 'Vui lòng click vào link dưới đây để kích hoạt tài khoản của bạn: <br>';
-        //     $content .= $linkActive . '<br>';
-        //     $content .= 'Trân trọng!';
-
-        //     $sendStatus = Mailer::sendMail($_POST['email'], $subject, $content);
-
-        //     if ($sendStatus) :
-        //         return true;
-        //     endif;
-        // endif;
+        
+        if ($insertStatus) :
+            // Tạo link active
+            // $linkActive = _WEB_ROOT . '/auth/active?token=' . $activeToken;
+            $linkActive = 'http://localhost:3000/activateAccount?token=' . $activeToken;
+            
+            // Thiết lập mail
+            $subject = ucwords($_POST['fullname']) . ' ơi. Bạn vui lòng kích hoạt tài khoản';
+            $content = 'Chào bạn: ' . ucwords($_POST['fullname']) . '<br>';
+            $content .= 'Vui lòng click vào link dưới đây để kích hoạt tài khoản của bạn: <br>';
+            $content .= '<a href="' . $linkActive . '">here</a><br>';
+            $content .= 'Trân trọng!';
+            
+            // Trigger webhook
+            $webhookUrl = "http://localhost:5678/webhook/send-verification-email"; // Địa chỉ webhook của n8n
+            
+            $data = [
+                'subject' => $subject,
+                'content' => $content,
+                'email' => $_POST['email'],
+            ];
+            
+            // Khởi tạo cURL
+            $ch = curl_init($webhookUrl);
+            
+            // Cấu hình cURL
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+            
+            // Gửi request và nhận phản hồi
+            $response = curl_exec($ch);
+            
+            // Kiểm tra lỗi
+            if (curl_errno($ch)) {
+                echo 'Error:' . curl_error($ch);
+            }
+            
+            // Đóng cURL
+            curl_close($ch);
+        
+            // Nếu gửi thành công, trả về true
+            if ($response) :
+                return true;
+            endif;
+        endif;
+        
 
         return false;
     }
     public function handleActiveAccount($token)
     {
-        if (!empty($token)) :
+        if (!empty($token)) {
             // Truy vấn sql để so sánh
             $tokenQuery = $this->db->table('users')
                 ->select('id, fullname, email')
                 ->where('active_token', '=', $token)
                 ->first();
 
-            if (!empty($tokenQuery)) :
-                $userId = $tokenQuery['id'];
+            if (!empty($tokenQuery)) {
+                $email = $tokenQuery['email'];
                 $dataUpdate = [
                     'status' => 1,
                     'active_token' => null
                 ];
-                $updateStatus = $this->db->table('users')->update($dataUpdate, "id = $userId");
-                if ($updateStatus) :
+
+                $updateStatus = $this->db->table('users')->where('email', '=', $email)->update($dataUpdate);
+
+                // Log kết quả
+                file_put_contents('log.txt', print_r($updateStatus, true), FILE_APPEND);
+                file_put_contents('log.txt', print_r('\n', true), FILE_APPEND);
+                file_put_contents('log.txt', print_r($token, true), FILE_APPEND);
+
+                if ($updateStatus == 1 || $updateStatus == '1') {
                     return true;
-                endif;
-            endif;
-        endif;
+                }
+            }
+        }
 
         return false;
     }
+
     public function handleLogout($userId)
     {
         $queryDelete = $this->db->table('login_token')
